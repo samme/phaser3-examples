@@ -185,38 +185,42 @@ files.push('zelda-hearts');
 files.push('zelda-life');
 
 var game = new Phaser.Game(config);
+var text;
 
 function create ()
 {
-    var text = this.add.text(10, 10, 'Click to start the loader', { font: '16px Courier', fill: '#00ff00' });
+    text = this.add.text(10, 10, 'Click to start the loader', { font: '16px Courier', fill: '#00ff00' });
 
-    this.input.once('pointerup', function () {
-  
-        text.setVisible(false);
-
+    this.input.once('pointerup', function ()
+    {
         this.load.setPath('assets/sprites/');
 
-        this.load.on('filecomplete', addNextFile, this);
+        this.load.on('start', onLoadStart, this);
+        this.load.on('filecomplete', onFileComplete, this);
+        this.load.on('complete', onLoadComplete, this);
 
-        //  It needs _something_ in the queue, or `start` will just exit immediately.
-        this.load.image('atari130xe');
+        this.load.image(files);
 
         this.load.start();
-    
     }, this);
 }
 
-function addNextFile (key, type, texture)
+function onLoadStart ()
+{
+    text.setText('Loading …');
+}
+
+function onFileComplete (key, type, texture)
 {
     var x = Phaser.Math.Between(0, 800);
     var y = Phaser.Math.Between(0, 600);
 
     this.add.image(x, y, key);
 
-    var nextFile = files.pop();
+    console.log(key);
+}
 
-    if (nextFile)
-    {
-        this.load.image(nextFile);
-    }
+function onLoadComplete ()
+{
+    text.setText('Done').setDepth(1);
 }
